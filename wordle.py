@@ -9,17 +9,19 @@ def print_border(word_length):
         print("-----", end=" ")
     print()
 
+def color_letter(letter, color):
+    return f"{color}{letter}{Style.RESET_ALL}"
 
 def print_word(word, guess):
     print_border(len(guess))
     status = check_guess(word, guess)
     for index, letter in enumerate(guess):
         if status[index][letter] == 1:
-            print(f"| {Fore.GREEN}{letter}{Style.RESET_ALL} |", end=" ")
+            print(f"| {color_letter(letter, Fore.GREEN)} |", end=" ")
         elif status[index][letter] == 2:
-            print(f"| {Fore.YELLOW}{letter}{Style.RESET_ALL} |", end=" ")
+            print(f"| {color_letter(letter, Fore.YELLOW)} |", end=" ")
         else:
-            print(f"| {Fore.RED}{letter}{Style.RESET_ALL} |", end=" ")
+            print(f"| {color_letter(letter, Fore.RED)} |", end=" ")
     print()
     print_border(len(guess))
 
@@ -50,18 +52,43 @@ def get_word():
         words = [word[0:-1] for word in words]
         word = random.choice(words)
     return [words, word]
+
+def print_keyboard(letters):
+    for letter in letters:
+        print(f"[{color_letter(letter, Fore.RED)}]", end=" ")
+    print()
+
+def get_wrong_letters(word, guess):
+    letters = []
+    for letter in guess:
+        if letter not in word:
+            letters.append(letter)
+    return letters
+
+def check_for_used_letters(wrong_letters, guess):
+    used_letters = []
+    for letter in guess:
+        if letter in wrong_letters:
+            used_letters.append(letter)
+    return used_letters
+
+def wordle():
+    pass
 if __name__ == "__main__":
     title = pf.figlet_format("WORDLE")
     print(title)
     words, word = get_word()
     word_length = len(word)
     attempts = 0
-    guesses = [" "*word_length for i in range(5)]
+    guessing_board = [" "*word_length for i in range(5)]
+    guesses = []
+    alphabets = alpha
     wrong_letters = []
-    print_board(guesses, word)
+    print_board(guessing_board, word)
     won = False
     while attempts < word_length:
         guess = input("Guess the word: > ")
+        used_letters = check_for_used_letters(wrong_letters, guess)
         if len(guess) != word_length:
             print("Please, your guess word should be of length 5")
         elif not guess.isalpha():
@@ -70,12 +97,20 @@ if __name__ == "__main__":
             print("Please, only lowercase characters are accepted")
         elif guess not in words:
             print("word doesn't exist in the list")
+        elif guess in guesses:
+            print("you've already guessed that")
+        elif len(used_letters) != 0:
+            print(f"these letters {used_letters} are already used")
         else:
-            guesses[attempts] = guess
-            print_board(guesses, word)
+            wrong_letters  = list(set(wrong_letters + get_wrong_letters(word, guess)))
+            guessing_board[attempts] = guess
+            print_board(guessing_board, word)
+            print_keyboard(wrong_letters)
             if guess == word:
                 won = True
                 break
+            else:
+                guesses.append(guess)
             attempts += 1
 
     if won:
