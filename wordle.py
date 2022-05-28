@@ -53,9 +53,15 @@ def get_word():
         word = random.choice(words)
     return [words, word]
 
-def print_keyboard(letters):
+def print_keyboard(letters, type):
+    #0 for wrong which mean print keyboard letter in red
+    #1 for available letters which mean print available letters in blue
+    if type == 0:
+        print("used letters :", end=" ")
+    else:
+        print("available letters :", end=" ")
     for letter in letters:
-        print(f"[{color_letter(letter, Fore.RED)}]", end=" ")
+        print(f"[{color_letter(letter, Fore.RED)  if type == 0 else color_letter(letter, Fore.BLUE)}]", end=" ")
     print()
 
 def get_wrong_letters(word, guess):
@@ -72,12 +78,14 @@ def check_for_used_letters(wrong_letters, guess):
             used_letters.append(letter)
     return used_letters
 
-def wordle():
-    pass
-if __name__ == "__main__":
-    title = pf.figlet_format("WORDLE")
-    print(title)
-    words, word = get_word()
+def get_available_letters(wrong_letters):
+    available_letters = []
+    for letter in alpha:
+        if letter not in wrong_letters:
+            available_letters.append(letter)
+    return available_letters
+
+def wordle(words, word):
     word_length = len(word)
     attempts = 0
     guessing_board = [" "*word_length for i in range(5)]
@@ -85,7 +93,6 @@ if __name__ == "__main__":
     alphabets = alpha
     wrong_letters = []
     print_board(guessing_board, word)
-    won = False
     while attempts < word_length:
         guess = input("Guess the word: > ")
         used_letters = check_for_used_letters(wrong_letters, guess)
@@ -105,17 +112,36 @@ if __name__ == "__main__":
             wrong_letters  = list(set(wrong_letters + get_wrong_letters(word, guess)))
             guessing_board[attempts] = guess
             print_board(guessing_board, word)
-            print_keyboard(wrong_letters)
+            print_keyboard(wrong_letters, 0)
+            print_keyboard(get_available_letters(wrong_letters), 1)
             if guess == word:
-                won = True
-                break
+                return True
             else:
                 guesses.append(guess)
             attempts += 1
+    return False
 
-    if won:
-    	message = pf.figlet_format("Well Done!")
-    	print(f"{Fore.GREEN}{message}{Style.RESET_ALL}")
-    else:
-        message  = pf.figlet_format("Good luck next time!")
-        print(f"{Fore.RED}{message}{Style.RESET_ALL}")
+if __name__ == "__main__":
+    title = pf.figlet_format("WORDLE")
+    print(title)
+    print("welcome! this is a terminal version of the well known wordle")
+    menu = "type \"play\" to play the game or \"exit\" to exit the game > "
+    won = False
+    words, word = [], ""
+    while True:
+        choice = input(menu)
+        words, word = get_word()
+        if choice == "play":
+            won  = wordle(words, "smile")
+            if won:
+    	        message = pf.figlet_format("Well Done!")
+    	        print(f"{Fore.GREEN}{message}{Style.RESET_ALL}")
+            else:
+                print(f"the word was : {word}")
+                message  = pf.figlet_format("Good luck next time!")
+                print(f"{Fore.RED}{message}{Style.RESET_ALL}")
+        elif choice == "exit":
+            break
+        else:
+            print("Please enter a valid choice")
+    print("thanks for playing, come back again soon")
