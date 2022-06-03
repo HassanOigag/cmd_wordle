@@ -13,7 +13,7 @@ if __name__ == "__main__":
         choice = input(menu)
         words, word = helper_functions.get_word()
         if choice == "play":
-            won  = helper_functions.play_wordle(words, "smile")
+            won  = helper_functions.play_wordle(words, word)
             if won:
     	        message = pf.figlet_format("Well Done!")
     	        print(f"{Fore.GREEN}{message}{Style.RESET_ALL}")

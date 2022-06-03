@@ -84,16 +84,17 @@ def get_available_letters(wrong_letters):
     return available_letters
 
 def play_wordle(words, word):
+    max_guess = 6
     word_length = len(word)
     attempts = 0
-    guessing_board = [" "*word_length for i in range(5)]
+    guessing_board = [" "*word_length for i in range(max_guess)]
     guesses = []
     alphabets = alpha
     wrong_letters = []
     print_board(guessing_board, word)
-    while attempts < word_length:
+    while attempts < max_guess:
         guess = input("Guess the word: > ")
-        used_letters = check_for_used_letters(wrong_letters, guess)
+        used_letters = check_for_used_letters(wrong_letters, guess) 
         if len(guess) != word_length:
             print("Please, your guess word should be of length 5")
         elif not guess.isalpha():
